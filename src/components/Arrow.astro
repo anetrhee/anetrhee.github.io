@@ -1,0 +1,15 @@
+---
+// Right-pointing (default), diagonal (north-east) or up arrow drawn as a 1px stroke.
+interface Props { dir?: 'right' | 'diag' | 'up'; }
+const { dir = 'right' } = Astro.props;
+const paths = {
+  right: 'M2 12h19M14 5l7 7-7 7',
+  diag: 'M6 18L18 6M8 6h10v10',
+  up: 'M12 21V3M5 10l7-7 7 7',
+};
+const d = paths[dir];
+---
+<span class:list={['arrow-box', dir === 'diag' && 'arrow-box--diag', dir === 'up' && 'arrow-box--up']} aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d={d} /></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d={d} /></svg>
+</span>

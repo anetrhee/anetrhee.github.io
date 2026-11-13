@@ -1,0 +1,23 @@
+---
+interface Props { value: number; suffix?: string; label: string; class?: string; }
+const { value, suffix = '', label, class: cls = '' } = Astro.props;
+const formatted = value.toLocaleString('en-US');
+---
+<div class:list={['stat', cls]}>
+  <p class="stat__num" aria-label={`${formatted}${suffix} ${label}`}>
+    <span data-count={value} aria-hidden="true">{formatted}</span><span class="stat__suffix serif" aria-hidden="true">{suffix}</span>
+  </p>
+  <p class="stat__label ui muted" aria-hidden="true">{label}</p>
+</div>
+
+<style>
+  .stat { display: flex; flex-direction: column; gap: 0.9rem; }
+  .stat__num {
+    font-size: clamp(3.5rem, 8.5vw, 8.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .stat__suffix { color: var(--accent); letter-spacing: 0; margin-left: 0.04em; }
+</style>

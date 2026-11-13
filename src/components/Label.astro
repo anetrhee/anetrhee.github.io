@@ -1,0 +1,9 @@
+---
+interface Props { text: string; class?: string; as?: 'p' | 'span' | 'h2'; }
+const { text, class: cls = '', as: Tag = 'p' } = Astro.props;
+---
+<Tag class:list={['label ui', cls]} data-label data-scramble-hover>({text})</Tag>
+
+<style>
+  .label { color: var(--accent); display: inline-block; white-space: nowrap; }
+</style>

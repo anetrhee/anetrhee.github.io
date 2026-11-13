@@ -1,0 +1,15 @@
+---
+import { person } from '../data/resume';
+interface Props { class?: string; showCity?: boolean; }
+const { class: cls = '', showCity = true } = Astro.props;
+---
+<p class:list={['clock ui', cls]} data-clock data-tz={person.timeZone}>
+  {showCity && <span class="clock__city">{person.city}</span>}
+  <time class="clock__time" data-clock-time>--:-- --</time>
+</p>
+
+<style>
+  .clock { display: inline-flex; gap: 0.5em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .clock__city { color: var(--fg); }
+  .clock__time { color: var(--fg-2); }
+</style>

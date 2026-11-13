@@ -1,0 +1,74 @@
+---
+import '@fontsource/inter-tight/400.css';
+import '@fontsource/inter-tight/500.css';
+import '@fontsource/inter-tight/600.css';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import 'lenis/dist/lenis.css';
+import '../styles/global.css';
+
+import interTight400 from '@fontsource/inter-tight/files/inter-tight-latin-400-normal.woff2?url';
+import interTight500 from '@fontsource/inter-tight/files/inter-tight-latin-500-normal.woff2?url';
+import serifItalic from '@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Transition from '../components/Transition.astro';
+import { person } from '../data/resume';
+
+interface Props {
+  title: string;
+  description: string;
+  current: 'home' | 'info';
+  intro?: boolean;
+}
+const { title, description, current, intro = false } = Astro.props;
+---
+<!doctype html>
+<html lang="en" class:list={['is-loading', intro && 'is-intro-locked']}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f4efe9" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon-1.png" data-favicon />
+    <link rel="preload" href={interTight400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={interTight500} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifItalic} as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      history.scrollRestoration = 'manual';
+      // Safety net: never leave the page hidden if a script fails.
+      setTimeout(function () {
+        var h = document.documentElement;
+        if (h.classList.contains('is-loading')) {
+          h.classList.remove('is-loading', 'is-intro-locked');
+          var t = document.querySelector('[data-transition]');
+          if (t) t.classList.remove('is-active');
+        }
+      }, 6000);
+    </script>
+  </head>
+  <body data-page={current}>
+    <a href="#main" class="skip-link ui no-transition">Skip to content</a>
+    <Transition dark={intro} />
+    <Header current={current} />
+    <slot name="before-main" />
+    <main id="main" class="page">
+      <slot />
+    </main>
+    <Footer />
+    <div class="side-marks" aria-hidden="true">
+      <span class="mono-mark mono-mark--a side-marks__a">{person.monogram[0]}</span>
+      <span class="mono-mark mono-mark--r serif side-marks__r">{person.monogram[1]}</span>
+    </div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

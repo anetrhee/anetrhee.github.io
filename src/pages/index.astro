@@ -1,0 +1,459 @@
+---
+import Base from '../layouts/Base.astro';
+import Label from '../components/Label.astro';
+import Clock from '../components/Clock.astro';
+import WorkRow from '../components/WorkRow.astro';
+import Cover from '../components/Cover.astro';
+import ArrowLink from '../components/ArrowLink.astro';
+import { person, work, recognition, skills } from '../data/resume';
+
+const title = `${person.first} ${person.last} — Designer & Storyteller`;
+const description = `${person.first} ${person.last}: ${person.taglineLead.toLowerCase()} ${person.taglineRest}`;
+const [feature, ...rest] = work;
+const variants = ['right', 'left', 'center'] as const;
+// Placeholder covers per group; set `image` (e.g. '/assets/archery.jpg') to swap in a real picture.
+const skillGroups: { label: string; items: string[]; tone: string; image?: string; interests?: boolean }[] = [
+  { label: 'Capabilities', items: skills.capabilities, tone: '#ECC9C0' },
+  { label: 'Tools', items: skills.tools, tone: '#E9C7A8' },
+  { label: 'Interests', items: skills.interests.map((i) => i.name), tone: '#DCC4CA', interests: true },
+  { label: 'Languages', items: skills.languages, tone: '#EEDDB5' },
+];
+---
+<Base title={title} description={description} current="home" intro>
+  <div class="intro" data-intro slot="before-main" aria-hidden="true">
+    <div class="intro__panel intro__panel--l" data-intro-pl></div>
+    <div class="intro__panel intro__panel--r" data-intro-pr></div>
+    <span class="intro__seam" data-intro-seam></span>
+    <div class="intro__meta ui" data-intro-meta>
+      <span class="intro__tl">{person.first} {person.last}</span>
+      <span class="intro__tr">Portfolio ©{person.year}</span>
+      <span class="intro__bl">Designer &amp; Storyteller — {person.city}</span>
+      <span class="intro__br" data-intro-count>000</span>
+    </div>
+    <div class="intro__mono">
+      <span class="intro__mask" data-intro-wa><span class="mono-mark mono-mark--a" data-intro-a>{person.monogram[0]}</span></span>
+      <span class="intro__mask" data-intro-wr><span class="mono-mark mono-mark--r serif" data-intro-r>{person.monogram[1]}</span></span>
+    </div>
+  </div>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero" data-hero aria-label="Introduction">
+    <div class="hero__bg" data-parallax="30px">
+      <div class="hero__gl" data-hero-gl></div>
+    </div>
+    <div class="hero__layer hero__mono" data-parallax="rotate" aria-hidden="true">
+      <span>{person.monogram[0]}</span><span class="serif">{person.monogram[1]}</span>
+    </div>
+    <div class="hero__layer hero__ring" data-parallax="3.5rem" aria-hidden="true"></div>
+
+    <div class="hero__top wrap">
+      <h1 class="hero__name">
+        <span>{person.first}</span> <span class="serif">{person.last}</span>
+      </h1>
+      <div class="hero__bar grid ui" data-hero-fade>
+        <Clock class="hero__clock" />
+        <p class="hero__links">
+          <a href={person.linkedin} target="_blank" rel="noopener noreferrer" class="text-link"><span data-scramble-hover>LinkedIn</span><span class="sr-only"> (opens in a new tab)</span></a>
+          <span class="muted" aria-hidden="true">/</span>
+          <a href={`mailto:${person.email}`} class="text-link"><span data-scramble-hover>Email</span></a>
+        </p>
+        <nav class="hero__nav" aria-label="Hero">
+          <a href="/" class="text-link" aria-current="page"><span data-scramble-hover>Home</span></a>
+          <a href="#work" class="text-link"><span data-scramble-hover>Work</span></a>
+          <a href="/info" class="text-link"><span data-scramble-hover>Info</span></a>
+          <a href="#contact" class="text-link"><span data-scramble-hover>Contact</span></a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="hero__tagline-wrap" data-parallax="1.5rem">
+      <p class="hero__tagline" data-hero-fade>
+        <span class="serif">{person.taglineLead}</span> {person.taglineRest}
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== (Info) ===== -->
+  <section class="section wrap info" aria-labelledby="info-title">
+    <div class="grid">
+      <Label text="Info" class="info__label" />
+      <h2 id="info-title" class="lead info__text" data-split>{person.intro}</h2>
+      <div class="info__cta" data-fade>
+        <ArrowLink href="/info" label="About me" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== (Folio) ===== -->
+  <section class="folio" id="work" aria-labelledby="folio-title">
+    <div class="folio__head wrap">
+      <Label text="AR® Folio" class="folio__label" />
+      <h2 id="folio-title" class="folio__title" data-split>
+        Selected <span class="serif">({String(work.length).padStart(2, '0')})</span>
+      </h2>
+    </div>
+
+    <WorkRow item={feature} index={0} variant="feature" />
+
+    {rest.map((item, i) => <WorkRow item={item} index={i + 1} variant={variants[i % variants.length]} />)}
+  </section>
+
+  <!-- ===== (Recognition) ===== -->
+  <section class="section recog" aria-labelledby="recog-title">
+    <div class="recog__head wrap">
+      <Label text="Recognition" />
+      <p class="ui muted">{recognition.award.date}</p>
+    </div>
+    <h2 id="recog-title" class="recog__title wrap" data-split>
+      {recognition.award.title} <span class="serif">{recognition.award.medal}</span>
+    </h2>
+    <article class="recog__card wrap">
+      <div class="recog__media" data-clip data-speed>
+        <Cover title={recognition.japan.title} kicker="Field study" num="5" tone="#ECC9C0" image={recognition.japan.image} alt="Japan research trip" ratio="4 / 5" />
+      </div>
+      <div class="recog__copy ui">
+        <p class="accent">{recognition.japan.kicker}</p>
+        <h3 class="recog__h">{recognition.japan.title} <span class="serif">post-WWII history</span></h3>
+        <p class="muted">{recognition.japan.line}</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===== (Skills & Interests) ===== -->
+  <section class="section skills" data-skills aria-labelledby="skills-title">
+    <div class="skills__glow" aria-hidden="true"></div>
+    <h2 id="skills-title" class="skills__title wrap" data-skills-title>
+      <span>Key skills</span> <span class="serif">&amp; interests</span>
+    </h2>
+
+    <div class="skills__body wrap">
+      <div class="skills__media" aria-hidden="true">
+        <div class="skills__media-stick">
+          {skillGroups.map((g, i) => (
+            <div class:list={['skills__card', i === 0 && 'is-active']} data-skills-card={i}>
+              <Cover title={g.label} kicker={`0${i + 1} / 0${skillGroups.length}`} tone={g.tone} image={g.image} alt="" ratio="4 / 5" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <dl class="skills__list">
+        {skillGroups.map((g, gi) => (
+          <div class="skills__group" data-skills-group={gi}>
+            <dt class="serif" data-skill-item>{g.label}</dt>
+            <dd>
+              <ul class:list={[g.interests && 'interests']}>
+                {g.items.map((s, i) => g.interests ? (
+                  <li class="interests__item" data-skill-item data-preview-host>
+                    <span class="interests__name">{s}</span>
+                    <div class="interests__preview" data-preview aria-hidden="true">
+                      <div data-preview-inner class="interests__preview-inner">
+                        <Cover title={skills.interests[i].short} kicker="Interest" num={`0${i + 1}`} tone={skills.interests[i].tone} image={skills.interests[i].image} alt="" />
+                      </div>
+                    </div>
+                  </li>
+                ) : (
+                  <li data-skill-item>{s}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- Intro ---------- */
+  .intro {
+    --ink: #231d1a;
+    --cream: #f4efe9;
+    position: fixed;
+    inset: 0;
+    z-index: 800;
+    pointer-events: none;
+    color: var(--cream);
+  }
+  .intro__panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50.5%;
+    background: var(--ink);
+  }
+  .intro__panel--l { left: 0; }
+  .intro__panel--r { right: 0; }
+  .intro__seam {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    margin-left: -0.5px;
+    background: rgba(244, 239, 233, 0.35);
+    transform: scaleY(0);
+  }
+  .intro__meta span { position: absolute; opacity: 0; color: rgba(244, 239, 233, 0.7); }
+  .intro__tl { top: 1.25rem; left: var(--pad); }
+  .intro__tr { top: 1.25rem; right: var(--pad); }
+  .intro__bl { bottom: 1.25rem; left: var(--pad); }
+  .intro__br { bottom: 1.25rem; right: var(--pad); font-variant-numeric: tabular-nums; color: var(--cream) !important; }
+  .intro__mono {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.16em;
+    font-size: clamp(6rem, 17vw, 16rem);
+  }
+  .intro__mask { display: inline-block; overflow: hidden; line-height: 0; }
+  .intro__mono .mono-mark { color: var(--cream); }
+  :global(html:not(.js)) .intro { display: none; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    height: 100svh;
+    min-height: 34rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .hero__bg { position: absolute; inset: -40px; }
+  .hero__gl {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 55% at 70% 45%, var(--blush) 0%, transparent 65%),
+      radial-gradient(50% 50% at 25% 65%, var(--peach) 0%, transparent 70%),
+      var(--bg);
+  }
+  .hero__gl.has-gl { background: var(--bg); }
+  .hero__gl :global(canvas) { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(244,239,233,0.45) 0%, transparent 35%, transparent 55%, rgba(244,239,233,0.9) 100%);
+  }
+
+  .hero__layer { position: absolute; pointer-events: none; }
+  .hero__mono {
+    left: 50%;
+    top: 42%;
+    translate: -50% -50%;
+    font-size: clamp(14rem, 34vw, 34rem);
+    line-height: 0.8;
+    letter-spacing: -0.08em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(35, 29, 26, 0.14);
+    white-space: nowrap;
+  }
+  .hero__ring {
+    width: clamp(9rem, 16vw, 16rem);
+    aspect-ratio: 1;
+    border: 1px solid rgba(35, 29, 26, 0.16);
+    border-radius: 50%;
+    right: 9%;
+    top: 18%;
+  }
+  .hero__ring::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    top: 14%; left: 14%;
+  }
+
+  .hero__top { position: relative; z-index: 2; padding-bottom: 0.9rem; }
+  .hero__name {
+    font-weight: 400;
+    font-size: clamp(3.5rem, 18.6vw, 30rem);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .hero__name .serif { letter-spacing: -0.02em; }
+  .hero__bar { margin-top: 1.1rem; align-items: center; }
+  .hero__clock { grid-column: 1 / 5; }
+  .hero__links { grid-column: 5 / 9; justify-self: center; display: flex; gap: 0.6rem; }
+  .hero__nav { grid-column: 9 / 13; justify-self: end; display: flex; gap: 1.25rem; }
+  .hero__nav a[aria-current='page'] { color: var(--fg-2); }
+
+  .hero__tagline-wrap {
+    position: absolute;
+    left: 50%;
+    top: clamp(4rem, 14vh, 8rem);
+    width: min(30rem, calc(100% - 2 * var(--pad)));
+    margin-left: calc(min(30rem, calc(100% - 2 * var(--pad))) / -2);
+    z-index: 2;
+  }
+  .hero__tagline {
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--fg-2);
+  }
+  .hero__tagline .serif { font-size: 1.6em; color: var(--fg); display: block; margin-bottom: 0.15em; }
+
+  /* ---------- Info ---------- */
+  .info .grid { row-gap: 2rem; }
+  .info__label { grid-column: 1 / 3; padding-top: 0.6em; }
+  .info__text { grid-column: 3 / 12; text-wrap: balance; }
+  .info__cta { grid-column: 3 / 12; }
+
+  /* ---------- Folio ---------- */
+  .folio { padding-top: var(--section); }
+  .folio__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .folio__title {
+    font-weight: 400;
+    font-size: clamp(3rem, 8vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    order: -1;
+  }
+
+  /* ---------- Recognition ---------- */
+  .recog__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.5rem; }
+  .recog__title {
+    font-weight: 400;
+    font-size: clamp(2.75rem, 7vw, 6.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .recog__card {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: 1.5rem;
+    margin-top: clamp(4rem, 8vw, 7rem);
+    align-items: end;
+  }
+  .recog__media { grid-column: 4 / 8; border-radius: 0.375rem; overflow: hidden; }
+  .recog__copy { grid-column: 9 / 12; display: flex; flex-direction: column; gap: 0.75rem; line-height: 1.45; }
+  .recog__h { font: inherit; }
+  .recog__h .serif { text-transform: none; font-size: 1.4em; letter-spacing: 0; }
+
+  /* ---------- Skills ---------- */
+  .skills { position: relative; overflow: clip; padding-bottom: 20vh; }
+  .skills__glow {
+    position: absolute;
+    inset: 10% -10% -10%;
+    background:
+      radial-gradient(40% 35% at 75% 30%, var(--blush) 0%, transparent 70%),
+      radial-gradient(35% 30% at 25% 60%, var(--butter) 0%, transparent 70%),
+      radial-gradient(30% 30% at 60% 85%, var(--mauve) 0%, transparent 70%);
+    filter: blur(50px);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .skills__title {
+    position: sticky;
+    top: calc(var(--header-h) + 0.5rem);
+    z-index: 0;
+    font-weight: 400;
+    font-size: clamp(3rem, 10.5vw, 11rem);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    text-align: center;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #231d1a 0%, #6b4a40 55%, #c98f7e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    will-change: filter, opacity, transform;
+  }
+  .skills__title .serif { text-transform: none; letter-spacing: -0.02em; display: inline-block; padding-right: 0.06em; }
+  .skills__body {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    margin-top: clamp(8rem, 30vh, 18rem);
+  }
+  .skills__media { grid-column: 2 / 5; }
+  .skills__media-stick { position: sticky; top: 30vh; aspect-ratio: 4 / 5; }
+  .skills__card {
+    position: absolute;
+    inset: 0;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    clip-path: inset(100% 0% 0% 0%);
+    transition: clip-path 0.9s var(--ease-out-quint);
+  }
+  .skills__card :global(.cover) { transform: scale(1.15); transition: transform 1.2s var(--ease-out-quint); }
+  .skills__card.is-active { clip-path: inset(0% 0% 0% 0%); z-index: 2; }
+  .skills__card.is-active :global(.cover) { transform: scale(1); }
+  .skills__card.was-active { clip-path: inset(0% 0% 0% 0%); z-index: 1; }
+
+  .skills__list { grid-column: 5 / 12; display: flex; flex-direction: column; gap: 2.25rem; padding-top: 30vh; }
+  .skills__group { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .skills__group dt {
+    grid-column: 1 / 3;
+    text-align: right;
+    font-size: clamp(1.5rem, 2.3vw, 2.125rem);
+    line-height: 1.12;
+  }
+  .skills__group dd { grid-column: 3 / 8; }
+  .skills__group li {
+    font-size: clamp(1.5rem, 2.3vw, 2.125rem);
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  .interests__item { position: relative; width: max-content; max-width: 100%; }
+  .interests__name { position: relative; z-index: 2; display: inline-block; transition: color 0.4s var(--ease-out-quint), transform 0.8s var(--ease-out-quint); }
+  .interests__preview {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(12rem, 17vw, 17rem);
+    margin-left: calc(clamp(12rem, 17vw, 17rem) / -2);
+    margin-top: calc(clamp(12rem, 17vw, 17rem) * -0.3125);
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0);
+    z-index: 1;
+  }
+  .interests__preview-inner { border-radius: 0.375rem; overflow: hidden; box-shadow: 0 30px 70px rgba(120, 80, 60, 0.18); }
+  @media (hover: hover) and (min-width: 768px) {
+    .interests__item:hover .interests__name { transform: translateX(0.5rem); }
+    .interests__item:hover { z-index: 5; }
+  }
+  @media (max-width: 767px), (hover: none) {
+    .interests__preview { display: none; }
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 767px) {
+    .hero__ring { display: none; }
+    .hero__name { font-size: 16.6vw; }
+    .hero__clock { grid-column: 1 / 7; }
+    .hero__links { grid-column: 7 / 13; justify-self: end; }
+    .hero__nav { display: none; }
+
+    .info__label, .info__text, .info__cta { grid-column: 1 / -1; }
+    .recog__media { grid-column: 2 / 12; }
+    .recog__copy { grid-column: 1 / -1; }
+    .skills__title { position: relative; top: auto; }
+    .skills__body { margin-top: 3rem; }
+    .skills__media { display: none; }
+    .skills__list { grid-column: 1 / -1; padding-top: 0; }
+    .skills__group dt { grid-column: 1 / -1; text-align: left; margin-bottom: 0.5rem; }
+    .skills__group dd { grid-column: 1 / -1; }
+  }
+</style>

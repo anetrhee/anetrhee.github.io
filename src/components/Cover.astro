@@ -1,0 +1,27 @@
+---
+// Typographic cover: used until a real image exists. Also serves as the cursor-follow preview.
+interface Props {
+  num?: string;
+  title: string;
+  kicker?: string;
+  tone?: string;
+  image?: string;
+  alt?: string;
+  class?: string;
+  ratio?: string;
+}
+const { num, title, kicker, tone = '#ECC9C0', image, alt = '', class: cls = '', ratio } = Astro.props;
+---
+<div class:list={['cover', cls]} style={`--tone:${tone};${ratio ? `aspect-ratio:${ratio};` : ''}`}>
+  <div class="cover__inner" data-cover-inner>
+    {image ? (
+      <img src={image} alt={alt} loading="lazy" decoding="async" />
+    ) : (
+      <>
+        {num && <span class="cover__num" aria-hidden="true">{num}</span>}
+        {kicker && <span class="cover__kicker ui">{kicker}</span>}
+        <span class="cover__title">{title}</span>
+      </>
+    )}
+  </div>
+</div>

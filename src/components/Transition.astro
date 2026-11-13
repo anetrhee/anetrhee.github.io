@@ -1,0 +1,36 @@
+---
+// Fixed overlay used for the blur page transition. Starts visible on every load and is faded out by transition.ts.
+// On pages with the intro it starts in the intro's dark ink so there is no cream flash before the curtain.
+interface Props { dark?: boolean; }
+const { dark = false } = Astro.props;
+---
+<div class:list={['transition is-active', dark && 'transition--dark']} data-transition aria-hidden="true">
+  <div class="transition-blur" data-transition-blur></div>
+  <div class="transition-fill" data-transition-fill></div>
+</div>
+
+<style>
+  .transition {
+    position: fixed;
+    inset: 0;
+    z-index: 950;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .transition.is-active { visibility: visible; pointer-events: auto; }
+  .transition-blur {
+    position: absolute;
+    inset: 0;
+    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(0px);
+  }
+  .transition-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    opacity: 1;
+  }
+  .transition--dark .transition-fill { background: #231d1a; }
+  /* no-JS: never block the page */
+  :global(html:not(.js)) .transition { display: none; }
+</style>

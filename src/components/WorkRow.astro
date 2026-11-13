@@ -1,0 +1,163 @@
+---
+// A project embedded in the scroll. Two variants:
+//  - feature: sticky stage, cover grows from a small centred card to full-bleed, info overlays the bottom.
+//  - left | right | center: large offset gallery block with parallax + clip reveal.
+import Cover from './Cover.astro';
+import type { Work } from '../data/resume';
+
+interface Props { item: Work; index: number; variant: 'feature' | 'left' | 'right' | 'center'; }
+const { item, index, variant } = Astro.props;
+const num = String(index + 1).padStart(2, '0');
+const code = `00-${index + 1}`;
+const statLine = item.stat
+  ? `${item.stat.value.toLocaleString('en-US')}${item.stat.suffix} ${item.stat.label}`
+  : item.statText
+    ? `${item.statText.value}: ${item.statText.label}`
+    : '';
+---
+{variant === 'feature' ? (
+  <article class="feature" data-feature aria-labelledby={`w-${item.slug}`}>
+    <div class="feature__stage">
+      <div class="feature__media" data-feature-media>
+        <div class="feature__inner" data-feature-inner>
+          <Cover num={num} title={item.org} kicker={code} tone={item.tone} image={item.image} alt={item.org} ratio="auto" class="feature__cover" />
+        </div>
+      </div>
+
+      <div class="feature__info wrap" data-feature-info>
+        <div class="info-row grid ui">
+          <div class="info-row__a">
+            <h3 id={`w-${item.slug}`}>© {item.org}</h3>
+            <p class="info-row__dim">{item.line}</p>
+          </div>
+          <ul class="info-row__b accent">{item.tags.map((t) => <li>{t}</li>)}</ul>
+          <div class="info-row__c">
+            <p>{item.role}</p>
+            <p class="info-row__dim">{item.dates}{item.location && ` · ${item.location}`}</p>
+          </div>
+          <div class="info-row__d">
+            {item.stat && (
+              <p>
+                <span class="info-row__dim">{item.stat.label}</span>{' '}
+                <span data-count={item.stat.value}>{item.stat.value.toLocaleString('en-US')}</span>{item.stat.suffix}
+              </p>
+            )}
+            {item.bullets.slice(2).map((b) => <p class="info-row__dim">{b}</p>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+) : (
+  <article class:list={['work', `work--${variant}`]} aria-labelledby={`w-${item.slug}`}>
+    <div class="work__frame">
+      <div class="work__top ui">
+        <span>{code}</span>
+        <span class="work__top-meta">{item.role} · {item.dates}</span>
+      </div>
+      <div class="work__media" data-clip data-speed>
+        <Cover num={num} title={item.org} kicker={item.tags[0]} tone={item.tone} image={item.image} alt={item.org} />
+      </div>
+      <div class="work__info ui">
+        <div>
+          <h3 id={`w-${item.slug}`} class="work__title">© {item.org}</h3>
+          <p class="work__dim">{item.line}</p>
+        </div>
+        <ul class="accent">{item.tags.map((t) => <li>{t}</li>)}</ul>
+        <p class="work__stat">
+          {item.stat ? (
+            <>
+              <span data-count={item.stat.value}>{item.stat.value.toLocaleString('en-US')}</span>{item.stat.suffix}
+              <span class="work__dim"> {item.stat.label}</span>
+            </>
+          ) : (
+            <span class="work__dim">{statLine}</span>
+          )}
+        </p>
+      </div>
+    </div>
+  </article>
+)}
+
+<style>
+  /* ---------- Feature ---------- */
+  .feature { position: relative; height: 260vh; }
+  .feature__stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+  }
+  .feature__media {
+    position: absolute;
+    inset: 0;
+    /* start state (JS scrubs to inset(0)); also the no-JS / reduced-motion fallback is full-bleed */
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  .feature__inner { position: absolute; inset: 0; }
+  .feature__cover { position: absolute; inset: 0; height: 100%; aspect-ratio: auto !important; }
+  .feature__cover :global(.cover__title) {
+    left: 0; right: 0; top: 50%; bottom: auto;
+    transform: translateY(-50%);
+    text-align: center;
+    font-size: clamp(3rem, 9vw, 9rem);
+  }
+  .feature__cover :global(.cover__num) { font-size: clamp(8rem, 22vw, 22rem); top: auto; bottom: -0.2em; right: 2%; }
+  .feature__cover :global(.cover__kicker) { top: 50%; left: 50%; transform: translate(-50%, calc(-50% - clamp(3rem, 7vw, 7rem))); }
+  .feature__info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-bottom: 1.5rem;
+    padding-top: 6rem;
+    background: linear-gradient(to top, rgba(244, 239, 233, 0.92) 0%, rgba(244, 239, 233, 0.6) 55%, transparent 100%);
+  }
+
+  .info-row { row-gap: 1.25rem; align-items: start; }
+  .info-row p, .info-row li { line-height: 1.45; }
+  .info-row__a { grid-column: 1 / 5; display: flex; flex-direction: column; gap: 0.6rem; }
+  .info-row__a h3 { font: inherit; }
+  .info-row__b { grid-column: 5 / 7; }
+  .info-row__c { grid-column: 7 / 10; }
+  .info-row__d { grid-column: 10 / 13; text-align: right; }
+  .info-row__dim { color: var(--fg-2); max-width: 34ch; }
+  .info-row__d .info-row__dim { margin-left: auto; }
+  [data-count] { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Gallery blocks ---------- */
+  .work { padding: 0 var(--pad); margin-top: clamp(6rem, 14vw, 13rem); }
+  .work__frame { display: flex; flex-direction: column; gap: 0.75rem; }
+  .work--right .work__frame { width: 55%; margin-left: auto; }
+  .work--left .work__frame { width: 50%; margin-left: 5%; }
+  .work--center .work__frame { width: 56%; margin: 0 auto; }
+
+  .work__top { display: flex; justify-content: space-between; gap: 1rem; color: var(--fg-2); }
+  .work__media { border-radius: 0.375rem; overflow: hidden; }
+  .work__info {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 1.25rem;
+    padding-top: 0.5rem;
+  }
+  .work__title { font: inherit; margin-bottom: 0.4rem; }
+  .work__dim { color: var(--fg-2); }
+  .work__stat { text-align: right; }
+  .work__info p, .work__info li { line-height: 1.45; }
+
+  @media (max-width: 767px) {
+    .feature { height: auto; }
+    .feature__stage { position: relative; height: auto; overflow: visible; }
+    .feature__media { position: relative; inset: auto; aspect-ratio: 4 / 5; margin: 0 var(--pad); border-radius: 0.375rem; overflow: hidden; }
+    .feature__info { position: relative; padding: 1rem var(--pad) 0; background: none; }
+    .info-row__a, .info-row__b, .info-row__c, .info-row__d { grid-column: 1 / -1; text-align: left; }
+    .info-row__d .info-row__dim { margin-left: 0; }
+
+    .work { margin-top: 5rem; }
+    .work--right .work__frame, .work--left .work__frame, .work--center .work__frame { width: 100%; margin: 0; }
+    .work__info { grid-template-columns: 1fr; }
+    .work__stat { text-align: left; }
+    .work__top-meta { text-align: right; }
+  }
+</style>

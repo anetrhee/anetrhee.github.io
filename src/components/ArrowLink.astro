@@ -1,0 +1,29 @@
+---
+import Arrow from './Arrow.astro';
+interface Props { href: string; label: string; external?: boolean; class?: string; }
+const { href, label, external = false, class: cls = '' } = Astro.props;
+---
+<a
+  href={href}
+  class:list={['arrow-link ui', cls]}
+  data-arrow-link
+  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+>
+  <span data-scramble-hover>{label}</span>
+  <Arrow dir={external ? 'diag' : 'right'} />
+  {external && <span class="sr-only">(opens in a new tab)</span>}
+</a>
+
+<style>
+  .arrow-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    padding: 0.85em 1.1em;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    transition: border-color 0.4s var(--ease-out-quint), color 0.4s var(--ease-out-quint);
+  }
+  .arrow-link:hover { border-color: var(--accent); color: var(--accent); }
+  .arrow-link :global(.arrow-box) { width: 1.1em; height: 1.1em; }
+</style>

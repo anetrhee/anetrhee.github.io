@@ -1,0 +1,141 @@
+---
+import Clock from './Clock.astro';
+import { person } from '../data/resume';
+
+interface Props { current: 'home' | 'info'; }
+const { current } = Astro.props;
+
+const nav = [
+  { href: '/', label: 'Home', key: 'home' },
+  { href: current === 'home' ? '#work' : '/#work', label: 'Work', key: 'work' },
+  { href: '/info', label: 'Info', key: 'info' },
+  { href: '#contact', label: 'Contact', key: 'contact' },
+];
+---
+<header class="header wrap" data-header>
+  <a href="/" class="header__mark ui" aria-label={`${person.first} ${person.last}, home`}>
+    <span data-scramble-hover>{person.first} {person.last}</span>
+  </a>
+
+  <Clock class="header__clock" />
+
+  <nav class="header__nav" aria-label="Primary">
+    <ul>
+      {nav.map((n) => (
+        <li>
+          <a
+            href={n.href}
+            class="ui text-link"
+            aria-current={n.key === current ? 'page' : undefined}
+            data-scroll-to={n.key === 'contact' ? 'contact' : undefined}
+          >
+            <span data-scramble-hover>{n.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <button class="header__burger ui" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle>
+    <span class="header__burger-label">Menu</span>
+    <span class="header__burger-lines" aria-hidden="true"><i></i><i></i></span>
+  </button>
+</header>
+
+<div class="menu" id="menu" data-menu aria-hidden="true">
+  <nav aria-label="Mobile">
+    <ul class="menu__list">
+      {nav.map((n, i) => (
+        <li class="menu__item">
+          <a
+            href={n.href}
+            class="menu__link"
+            tabindex="-1"
+            aria-current={n.key === current ? 'page' : undefined}
+            data-scroll-to={n.key === 'contact' ? 'contact' : undefined}
+            data-menu-link
+          >
+            <span class="menu__num ui muted">0{i + 1}</span>
+            <span class:list={['menu__text', i % 2 === 1 && 'serif']}>{n.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="menu__foot ui">
+    <Clock />
+    <a href={`mailto:${person.email}`} class="text-link" tabindex="-1" data-menu-link>{person.email}</a>
+  </div>
+</div>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    height: var(--header-h);
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: center;
+    color: var(--fg);
+    transition: transform 0.7s var(--ease-out-quint);
+  }
+  .header.is-hidden { transform: translateY(-110%); }
+  .header__mark { grid-column: 1 / 4; justify-self: start; white-space: nowrap; }
+  .header__clock { position: absolute; left: 50%; top: 50%; translate: -50% -50%; }
+  .header__nav { grid-column: 9 / 13; justify-self: end; }
+  .header__nav ul { display: flex; gap: 1.75rem; }
+  .header__nav a[aria-current='page'] { color: var(--fg-2); }
+  .header__burger { display: none; }
+
+  @media (max-width: 767px) {
+    .header__clock, .header__nav { display: none; }
+    .header__mark { grid-column: 1 / 8; }
+    .header__burger {
+      display: inline-flex;
+      grid-column: 9 / 13;
+      justify-self: end;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 44px;
+      position: relative;
+      z-index: 2;
+    }
+    .header__burger-lines { position: relative; width: 18px; height: 8px; }
+    .header__burger-lines i {
+      position: absolute; left: 0; right: 0; height: 1px; background: currentColor;
+      transition: transform 0.5s var(--ease-out-quint), top 0.5s var(--ease-out-quint);
+    }
+    .header__burger-lines i:first-child { top: 0; }
+    .header__burger-lines i:last-child { top: 7px; }
+    :global(html.is-menu-open) .header__burger-lines i:first-child { top: 3.5px; transform: rotate(45deg); }
+    :global(html.is-menu-open) .header__burger-lines i:last-child { top: 3.5px; transform: rotate(-45deg); }
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: var(--bg);
+    padding: calc(var(--header-h) + 2rem) var(--pad) var(--pad);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    visibility: hidden;
+    clip-path: inset(0 0 100% 0);
+  }
+  .menu__list { display: flex; flex-direction: column; gap: 0.25rem; }
+  .menu__item { overflow: hidden; border-bottom: 1px solid var(--line); }
+  .menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    font-size: clamp(3rem, 15vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .menu__text { display: inline-block; }
+  .menu__foot { display: flex; flex-direction: column; gap: 0.75rem; }
+</style>
